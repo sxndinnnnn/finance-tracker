@@ -52,6 +52,11 @@ export default function Page() {
   const base = summary.base_currency_code;
   const baseDecimalPlaces = currencies.find((c) => c.code === base)?.decimal_places ?? 2;
   const divisor = 10 ** baseDecimalPlaces;
+  const numberFormat = new Intl.NumberFormat(user?.locale ?? "en-US", {
+    minimumFractionDigits: baseDecimalPlaces,
+    maximumFractionDigits: baseDecimalPlaces,
+  });
+  const tooltipFormatter = (value: number) => numberFormat.format(value);
   const trendData = summary.income_expense_trend.map((p) => ({
     month: p.month,
     Income: p.income_minor / divisor,
@@ -82,7 +87,7 @@ export default function Page() {
                 <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100 dark:stroke-slate-800" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                <Tooltip formatter={tooltipFormatter} />
                 <Legend />
                 <Line type="monotone" dataKey="Income" stroke="#059669" strokeWidth={2} dot={false} />
                 <Line type="monotone" dataKey="Expense" stroke="#dc2626" strokeWidth={2} dot={false} />
@@ -104,7 +109,7 @@ export default function Page() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-slate-100 dark:stroke-slate-800" />
                   <XAxis type="number" tick={{ fontSize: 12 }} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={100} />
-                  <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                  <Tooltip formatter={tooltipFormatter} />
                   <Bar dataKey="amount" fill="#334155" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
