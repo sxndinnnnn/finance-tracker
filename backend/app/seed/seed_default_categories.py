@@ -6,6 +6,8 @@ rows, not an enum — a user can rename or delete any of them.
 """
 import asyncio
 
+from sqlalchemy import select
+
 from app.core.database import SessionLocal
 from app.models.category import Category, CategoryKind
 
@@ -26,10 +28,20 @@ DEFAULT_CATEGORIES = [
 
 async def seed_default_categories() -> None:
     async with SessionLocal() as db:
+        existing = (
+            await db.execute(select(Category.name).where(Category.user_id.is_(None)))
+        ).scalars().all()
+        existing_names = set(existing)
+
+        added = 0
         for name, kind in DEFAULT_CATEGORIES:
+            if name in existing_names:
+                continue
             db.add(Category(user_id=None, name=name, kind=kind))
+            added += 1
+
         await db.commit()
-        print(f"Seeded {len(DEFAULT_CATEGORIES)} default categories.")
+        print(f"Seeded {added} default categories (skipped {len(existing_names)} already present).")
 
 
 if __name__ == "__main__":

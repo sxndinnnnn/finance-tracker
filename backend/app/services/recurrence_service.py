@@ -6,6 +6,7 @@ function instead of each model re-implementing "what does monthly mean".
 from datetime import date
 
 from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY, rrulestr
+from dateutil.rrule import MO, TU, WE, TH, FR, SA, SU
 
 from app.models.recurrence import RecurrenceRule, Frequency
 
@@ -15,6 +16,12 @@ _FREQ_MAP = {
     Frequency.monthly: MONTHLY,
     Frequency.yearly: YEARLY,
 }
+
+_WEEKDAY_MAP = {"MO": MO, "TU": TU, "WE": WE, "TH": TH, "FR": FR, "SA": SA, "SU": SU}
+
+
+def _parse_weekdays(by_weekday: str):
+    return [_WEEKDAY_MAP[code.strip().upper()] for code in by_weekday.split(",") if code.strip()]
 
 
 def next_occurrences(rule: RecurrenceRule, after: date, count: int = 1) -> list[date]:
@@ -27,6 +34,8 @@ def next_occurrences(rule: RecurrenceRule, after: date, count: int = 1) -> list[
             kwargs["until"] = rule.end_date
         if rule.by_monthday:
             kwargs["bymonthday"] = rule.by_monthday
+        if rule.by_weekday:
+            kwargs["byweekday"] = _parse_weekdays(rule.by_weekday)
         rr = rrule(_FREQ_MAP[rule.frequency], **kwargs)
 
     occurrences = []

@@ -12,6 +12,6 @@ class Currency(Base):
     __tablename__ = "currencies"
 
     code: Mapped[str] = mapped_column(String(3), primary_key=True)  # ISO 4217, e.g. "USD"
-    name: Mapped[str] = mapped_column(String(64))
+    name: Mapped[str] = mapped_column(String(128))
     symbol: Mapped[str] = mapped_column(String(8))
     decimal_places: Mapped[int] = mapped_column(Integer, default=2)

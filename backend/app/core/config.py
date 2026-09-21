@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # Auth
     secret_key: str
     access_token_expire_minutes: int = 60
+    refresh_token_expire_days: int = 30
     algorithm: str = "HS256"
 
     # Email
