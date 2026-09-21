@@ -14,12 +14,23 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str
+    # Managed Postgres (Supabase, RDS, etc.) requires TLS; a local dev
+    # instance typically doesn't expose it at all.
+    db_ssl_require: bool = False
 
     # Auth
     secret_key: str
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
     algorithm: str = "HS256"
+
+    # CORS — comma-separated origins, e.g. "https://app.example.com,https://staging.example.com".
+    # "*" is fine for local dev but should be the real frontend origin(s) in production.
+    cors_origins: str = "*"
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
     # Email
     email_provider: str = "smtp"  # smtp | sendgrid | resend
