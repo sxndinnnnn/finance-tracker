@@ -12,6 +12,7 @@ from app.api.v1 import (
     categories,
     credit_cards,
     currencies,
+    dashboard,
     leases,
     loans,
     subscriptions,
@@ -44,7 +45,7 @@ app.include_router(loans.router, prefix="/api/v1/loans", tags=["loans"])
 app.include_router(credit_cards.router, prefix="/api/v1/credit-cards", tags=["credit-cards"])
 app.include_router(leases.router, prefix="/api/v1/leases", tags=["leases"])
 app.include_router(subscriptions.router, prefix="/api/v1/subscriptions", tags=["subscriptions"])
-# ... one include_router per model, added as each is implemented
+app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboard"])
 
 
 @app.get("/health")
