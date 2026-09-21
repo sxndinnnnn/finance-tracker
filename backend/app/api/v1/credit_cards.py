@@ -6,9 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
 from app.api.v1.accounts import _current_balance_minor, _to_read as _account_to_read
+from app.api.v1.subscriptions import _to_read as _subscription_to_read
 from app.models.account import Account, AccountType
 from app.models.credit_card import CreditCard
 from app.models.currency import Currency
+from app.models.subscription import Subscription
 from app.models.user import User
 from app.schemas.credit_card import CreditCardCreate, CreditCardRead, CreditCardUpdate
 
@@ -18,6 +20,8 @@ router = APIRouter()
 async def _to_read(db: AsyncSession, card: CreditCard) -> CreditCardRead:
     account = await db.get(Account, card.account_id)
     balance = await _current_balance_minor(db, account)
+    subs_result = await db.execute(select(Subscription).where(Subscription.linked_credit_card_id == card.id))
+    subscriptions = [await _subscription_to_read(db, sub) for sub in subs_result.scalars().all()]
     return CreditCardRead(
         id=card.id,
         user_id=card.user_id,
@@ -29,6 +33,7 @@ async def _to_read(db: AsyncSession, card: CreditCard) -> CreditCardRead:
         due_day=card.due_day,
         current_balance_minor=balance,
         account=await _account_to_read(db, account),
+        linked_subscriptions=subscriptions,
     )
 
 

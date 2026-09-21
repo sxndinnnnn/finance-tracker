@@ -3,6 +3,7 @@ import uuid
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.account import AccountRead
+from app.schemas.subscription import SubscriptionRead
 
 
 class CreditCardCreate(BaseModel):
@@ -35,3 +36,6 @@ class CreditCardRead(BaseModel):
     due_day: int
     current_balance_minor: int
     account: AccountRead
+    # "which card is this subscription on" at a glance, and every
+    # subscription that needs a new card if this one gets cancelled.
+    linked_subscriptions: list[SubscriptionRead] = []
