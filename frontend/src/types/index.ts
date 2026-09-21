@@ -116,6 +116,7 @@ export interface CreditCard {
   due_day: number;
   current_balance_minor: number;
   account: Account;
+  linked_subscriptions?: Subscription[];
 }
 
 export interface Lease {

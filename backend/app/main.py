@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.jobs.subscription_reminders import start_scheduler, stop_scheduler
 
-from app.api.v1 import accounts, auth, categories, currencies, transactions
+from app.api.v1 import accounts, auth, categories, credit_cards, currencies, leases, loans, transactions
 
 
 @asynccontextmanager
@@ -30,6 +30,9 @@ app.include_router(currencies.router, prefix="/api/v1/currencies", tags=["curren
 app.include_router(categories.router, prefix="/api/v1/categories", tags=["categories"])
 app.include_router(accounts.router, prefix="/api/v1/accounts", tags=["accounts"])
 app.include_router(transactions.router, prefix="/api/v1/transactions", tags=["transactions"])
+app.include_router(loans.router, prefix="/api/v1/loans", tags=["loans"])
+app.include_router(credit_cards.router, prefix="/api/v1/credit-cards", tags=["credit-cards"])
+app.include_router(leases.router, prefix="/api/v1/leases", tags=["leases"])
 # ... one include_router per model, added as each is implemented
 
 
