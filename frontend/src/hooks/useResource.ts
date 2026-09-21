@@ -30,30 +30,35 @@ export function useResource<T extends WithId>(path: string) {
     reload();
   }, [reload]);
 
+  // Reload from the server after every mutation rather than patching local
+  // state optimistically: some endpoints have side effects beyond the one
+  // row returned (e.g. creating a fixed transaction also generates future
+  // occurrences, deleting one cancels them), so the list needs a real
+  // refetch to stay correct.
   const create = useCallback(
     async (body: unknown) => {
       const created = await api.post<T>(path, body);
-      setItems((prev) => [created, ...prev]);
+      await reload();
       return created;
     },
-    [path]
+    [path, reload]
   );
 
   const update = useCallback(
     async (id: string, body: unknown) => {
       const updated = await api.patch<T>(`${path}/${id}`, body);
-      setItems((prev) => prev.map((item) => (item.id === id ? updated : item)));
+      await reload();
       return updated;
     },
-    [path]
+    [path, reload]
   );
 
   const remove = useCallback(
     async (id: string) => {
       await api.delete(`${path}/${id}`);
-      setItems((prev) => prev.filter((item) => item.id !== id));
+      await reload();
     },
-    [path]
+    [path, reload]
   );
 
   return { items, loading, error, reload, create, update, remove };
