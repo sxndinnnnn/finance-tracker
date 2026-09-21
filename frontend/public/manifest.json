@@ -1,0 +1,9 @@
+{
+  "name": "Finance Tracker",
+  "short_name": "FinTrack",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": []
+}
