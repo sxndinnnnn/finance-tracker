@@ -12,6 +12,7 @@ from app.api.v1 import (
     auth,
     categories,
     credit_cards,
+    cron,
     currencies,
     dashboard,
     leases,
@@ -20,17 +21,19 @@ from app.api.v1 import (
     transactions,
 )
 
+settings = get_settings()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    start_scheduler()
+    if settings.enable_in_process_scheduler:
+        start_scheduler()
     yield
-    stop_scheduler()
+    if settings.enable_in_process_scheduler:
+        stop_scheduler()
 
 
 app = FastAPI(title="Finance Tracker API", version="0.1.0", lifespan=lifespan)
-
-settings = get_settings()
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,6 +52,7 @@ app.include_router(credit_cards.router, prefix="/api/v1/credit-cards", tags=["cr
 app.include_router(leases.router, prefix="/api/v1/leases", tags=["leases"])
 app.include_router(subscriptions.router, prefix="/api/v1/subscriptions", tags=["subscriptions"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboard"])
+app.include_router(cron.router, prefix="/api/v1/cron", tags=["cron"])
 
 
 @app.get("/health")

@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     # Managed Postgres (Supabase, RDS, etc.) requires TLS; a local dev
     # instance typically doesn't expose it at all.
     db_ssl_require: bool = False
+    # True when DATABASE_URL points at a pgbouncer/Supavisor transaction-mode
+    # pooler (Supabase's pooled connection, port 6543) — needed because
+    # asyncpg's prepared-statement caching breaks under transaction-mode
+    # pooling. Leave false for a direct connection (local dev, or the
+    # Supabase direct/5432 connection used for migrations).
+    db_disable_prepared_statement_cache: bool = False
 
     # Auth
     secret_key: str
@@ -45,6 +51,14 @@ class Settings(BaseSettings):
     # Reminder job
     reminder_check_hour_utc: int = 8
     default_reminder_days_before: int = 3
+    # In-process APScheduler is for local dev / a persistent-process
+    # deployment. On Vercel the function never stays alive long enough for
+    # a job registered inside it to fire — set false there; Vercel Cron
+    # hits /api/v1/cron/reminder-sweep instead.
+    enable_in_process_scheduler: bool = True
+    # Vercel sends `Authorization: Bearer $CRON_SECRET` automatically when
+    # this env var is set on the project. None locally.
+    cron_secret: str | None = None
 
 
 @lru_cache
